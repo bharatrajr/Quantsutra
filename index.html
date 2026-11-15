@@ -399,6 +399,20 @@ input{outline:none;font-family:inherit;}
 
 /* TIME STAT */
 .time-stat{font-family:var(--fm);font-size:.72rem;color:var(--ink3);margin-top:4px;}
+
+/* BOOKMARK */
+.bmark-btn{position:absolute;top:7px;left:9px;width:28px;height:28px;background:transparent;border:none;font-size:1rem;cursor:pointer;z-index:3;opacity:.35;transition:opacity .15s,transform .12s;line-height:1;padding:0;}
+.bmark-btn:active{transform:scale(.82);}
+.bmark-btn.saved{opacity:1;}
+.bmark-banner{background:linear-gradient(135deg,rgba(184,134,11,.08),transparent);border:1.5px solid rgba(184,134,11,.28);border-radius:var(--r);padding:13px 15px;margin-bottom:14px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:all .18s;}
+.bmark-banner:active{transform:scale(.985);}
+.bmark-banner .gb-title{color:var(--yellow);}
+/* Bookmark item in history */
+.bk-item{background:var(--card);border:1.5px solid var(--border);border-left:4px solid var(--yellow);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:10px;}
+.bk-q{font-family:var(--fm);font-size:.86rem;font-weight:700;flex:1;}
+.bk-a{font-family:var(--fm);font-size:.8rem;font-weight:700;color:var(--green);}
+.bk-rm{background:transparent;border:none;font-size:.85rem;color:var(--red);opacity:.6;cursor:pointer;padding:4px;}
+.bk-rm:active{opacity:1;}
 </style>
 </head>
 <body>
@@ -461,6 +475,15 @@ input{outline:none;font-family:inherit;}
         <div class="gb-desc">Beat the clock · Answer as many as you can in 60 seconds</div>
       </div>
       <div style="color:var(--blitz);font-size:1.1rem">›</div>
+    </div>
+
+    <div class="bmark-banner" id="bmark-banner" onclick="navTo('history');setTimeout(()=>hpTab(4,null),80)" style="display:none">
+      <div class="gb-icon">🔖</div>
+      <div class="gb-body">
+        <div class="gb-title">Bookmarked Questions</div>
+        <div class="gb-desc" id="bmark-banner-desc">0 questions saved · tap to review or drill</div>
+      </div>
+      <div style="color:var(--yellow);font-size:1.1rem">›</div>
     </div>
 
     <div class="sec-lbl">Practice Modules</div>
@@ -624,6 +647,7 @@ input{outline:none;font-family:inherit;}
   <div class="carea" id="drill-carea">
     <div class="ctag" id="d-tag">Squares</div>
     <div class="qcard" id="qcard">
+      <button class="bmark-btn" id="bmark-btn" onclick="toggleBookmark()" title="Bookmark">🔖</button>
       <div class="streak-badge" id="streak-badge">🔥 ×2</div>
       <div class="qtext" id="d-q">—</div>
       <div class="qhint" id="d-hint" style="display:none"></div>
@@ -719,6 +743,7 @@ input{outline:none;font-family:inherit;}
       <button class="hp-tab" onclick="hpTab(1,this)">Weak Spots</button>
       <button class="hp-tab" onclick="hpTab(2,this)">Stats</button>
       <button class="hp-tab" onclick="hpTab(3,this)">Reference</button>
+      <button class="hp-tab" onclick="hpTab(4,this)">🔖</button>
     </div>
     <div class="hp-pane on" id="hp-0">
       <div class="sec-lbl" style="margin-bottom:8px">Last 20 Sessions</div>
@@ -733,6 +758,12 @@ input{outline:none;font-family:inherit;}
       <div class="sec-lbl" style="margin-bottom:8px">Module Stats</div>
       <div id="pm-list"></div>
     </div>
+    <div class="hp-pane" id="hp-4">
+      <div class="sec-lbl" style="margin-bottom:8px">Bookmarked Questions</div>
+      <div id="bk-list"></div>
+      <button id="drill-bk-btn" class="startbtn" style="width:100%;display:none;margin-top:10px" onclick="startBookmarkDrill()">Drill Bookmarks →</button>
+    </div>
+
     <div class="hp-pane" id="hp-3">
       <div class="refsec"><h3>Squares 1–30</h3><div class="refcard"><table class="rt" id="sq-ref"></table></div></div>
       <div class="refsec"><h3>Cubes 1–20</h3><div class="refcard"><table class="rt" id="cb-ref"></table></div></div>
@@ -809,7 +840,7 @@ input{outline:none;font-family:inherit;}
 const SK='quantsutra_v4';
 function load(){try{return JSON.parse(localStorage.getItem(SK))||def();}catch{return def();}}
 function save(){localStorage.setItem(SK,JSON.stringify(D));}
-function def(){return{streak:0,lastDate:null,mods:{},leaderboard:[],wrongHistory:{},sessions:[],dailyGoal:50,dailyDone:0,dailyDate:null,soundOn:false,darkOn:false};}
+function def(){return{streak:0,lastDate:null,mods:{},leaderboard:[],wrongHistory:{},sessions:[],dailyGoal:50,dailyDone:0,dailyDate:null,soundOn:false,darkOn:false,bookmarks:{}};}
 let D=load();
 function ms(id){if(!D.mods[id])D.mods[id]={att:0,cor:0};return D.mods[id];}
 
@@ -1031,6 +1062,7 @@ function renderHome(){
   updStreak();
   updDailyCount();
   renderWeekStrip();
+  updHomeBmarkBanner();
   let att=0,cor=0;Object.values(D.mods).forEach(m=>{att+=m.att;cor+=m.cor;});
   document.getElementById('h-att').textContent=att;
   document.getElementById('h-cor').textContent=cor;
@@ -1279,6 +1311,7 @@ function loadQ(){
   }
   const q=S.bank[S.idx];
   S.answered=false;S.currentQ=q;S.qStartTime=Date.now();
+  setTimeout(updBmarkBtn,0);
   document.getElementById('d-tag').textContent=q.tag;
   document.getElementById('d-q').innerHTML=q.qh||q.q;
   const ht=document.getElementById('d-hint');
@@ -1523,11 +1556,13 @@ let currentHPTab=0;
 function hpTab(n,btn){
   currentHPTab=n;
   document.querySelectorAll('.hp-tab').forEach((b,i)=>b.classList.toggle('on',i===n));
-  document.querySelectorAll('.hp-pane').forEach((p,i)=>p.classList.toggle('on',i===n));
+  // panes are ordered 0,1,2,3,4 but hp-4 is before hp-3 in DOM — use id-based approach
+  [0,1,2,3,4].forEach(i=>{const p=document.getElementById('hp-'+i);if(p)p.classList.toggle('on',i===n);});
   if(n===0)renderSessions();
   if(n===1)renderWrongReview();
   if(n===2)renderModStats();
   if(n===3)renderRefTables();
+  if(n===4)renderBookmarks();
 }
 function renderHistory(){hpTab(currentHPTab,null);}
 
@@ -1608,6 +1643,61 @@ document.addEventListener('keydown',e=>{
   else if(e.key==='Escape')confirmEnd();
   else if(/^[\d.\-]$/.test(e.key))kp(e.key);
 });
+
+/* ══════════════════════════════════
+   BOOKMARKS
+══════════════════════════════════ */
+function bkKey(q){return q.key||btoa(unescape(encodeURIComponent(q.q+'|'+q.a))).slice(0,20);}
+function toggleBookmark(){
+  const q=S.currentQ;if(!q)return;
+  if(!D.bookmarks)D.bookmarks={};
+  const k=bkKey(q);
+  if(D.bookmarks[k]){delete D.bookmarks[k];}
+  else{D.bookmarks[k]={q:q.q,qh:q.qh||q.q,a:q.a,hint:q.hint||null,sub:q.sub||'',tag:q.tag||'',key:q.key||null,bkKey:k};}
+  save();
+  updBmarkBtn();
+}
+function updBmarkBtn(){
+  const q=S.currentQ;if(!q)return;
+  const k=bkKey(q);
+  const saved=!!(D.bookmarks&&D.bookmarks[k]);
+  const btn=document.getElementById('bmark-btn');
+  if(btn){btn.classList.toggle('saved',saved);btn.title=saved?'Remove bookmark':'Bookmark';}
+}
+function renderBookmarks(){
+  const bks=Object.values(D.bookmarks||{});
+  const el=document.getElementById('bk-list');
+  const btn=document.getElementById('drill-bk-btn');
+  if(!bks.length){
+    el.innerHTML='<div style="color:var(--ink3);font-size:.84rem;text-align:center;padding:30px">No bookmarks yet.<br>Tap 🔖 on any question while drilling to save it.</div>';
+    if(btn)btn.style.display='none';return;
+  }
+  if(btn)btn.style.display='';
+  el.innerHTML=bks.map(b=>`<div class="bk-item">
+    <div class="bk-q">${(b.qh||b.q).replace(/<[^>]*>/g,'')}</div>
+    <div class="bk-a">${b.a}</div>
+    <button class="bk-rm" onclick="removeBookmark('${b.bkKey}')" title="Remove">✕</button>
+  </div>`).join('');
+}
+function removeBookmark(k){
+  if(D.bookmarks)delete D.bookmarks[k];
+  save();renderBookmarks();updHomeBmarkBanner();
+}
+function updHomeBmarkBanner(){
+  const count=Object.keys(D.bookmarks||{}).length;
+  const banner=document.getElementById('bmark-banner');
+  if(!banner)return;
+  banner.style.display=count>0?'':'none';
+  const desc=document.getElementById('bmark-banner-desc');
+  if(desc)desc.textContent=`${count} question${count===1?'':'s'} saved · tap to review or drill`;
+}
+function startBookmarkDrill(){
+  const bks=Object.values(D.bookmarks||{});
+  if(!bks.length){showToast('No bookmarks yet');return;}
+  const bank=bks.map(b=>({q:b.q,qh:b.qh||b.q,a:b.a,hint:b.hint,sub:b.sub||'bk',tag:b.tag||'Bookmarks',key:b.key||null,bkKey:b.bkKey}));
+  S={mod:{id:'bookmarks',name:'Bookmarks'},mode:'type',bank:shuffle([...bank]),idx:0,ok:0,no:0,sk:0,wrongList:[],answered:false,isGame:false,isBlitz:false,isExam:false,score:0,lives:3,consec:0,multiplier:1,qTimer:null,speedSec:0,examLog:[],responseTimes:[],sessionStart:Date.now()};
+  initUI('Bookmarks','type',false);loadQ();
+}
 
 /* ══════════════════════════════════
    BLITZ MODE
