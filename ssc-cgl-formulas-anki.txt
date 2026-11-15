@@ -1,0 +1,175 @@
+#separator:tab
+#html:true
+#deck:SSC CGL Math Formulas
+#notetype:Basic
+#tags column:3
+
+Front	Back	Tags
+
+Algebra: (a + b)² = ?	a² + 2ab + b²	algebra
+Algebra: (a − b)² = ?	a² − 2ab + b²	algebra
+Algebra: (a + b)³ = ?	a³ + 3a²b + 3ab² + b³	algebra
+Algebra: (a − b)³ = ?	a³ − 3a²b + 3ab² − b³	algebra
+Algebra: a³ + b³ = ?	(a + b)(a² − ab + b²)	algebra
+Algebra: a³ − b³ = ?	(a − b)(a² + ab + b²)	algebra
+Algebra: a² − b² = ?	(a + b)(a − b)	algebra
+Algebra: (a + b + c)² = ?	a² + b² + c² + 2ab + 2bc + 2ca	algebra
+Algebra: a³ + b³ + c³ − 3abc = ?	(a + b + c)(a² + b² + c² − ab − bc − ca)	algebra
+If a + b + c = 0, then a³ + b³ + c³ = ?	3abc	algebra
+
+Percentage: Profit % formula?	Profit% = (Profit ÷ CP) × 100	percentage profit-loss
+Percentage: Loss % formula?	Loss% = (Loss ÷ CP) × 100	percentage profit-loss
+Percentage: SP when Profit% known?	SP = CP × (100 + P%) ÷ 100	percentage profit-loss
+Percentage: CP when SP and Profit% known?	CP = SP × 100 ÷ (100 + P%)	percentage profit-loss
+Percentage: SP when Loss% known?	SP = CP × (100 − L%) ÷ 100	percentage profit-loss
+Percentage: Marked Price → SP with discount d%?	SP = MP × (100 − d%) ÷ 100	percentage profit-loss
+Percentage: Net % after successive discounts a% and b%?	a + b − (a × b ÷ 100)	percentage profit-loss
+Percentage: If price increases by r%, what % must it fall to restore?	100r ÷ (100 + r)	percentage
+Percentage: If price falls by r%, what % must it rise to restore?	100r ÷ (100 − r)	percentage
+
+Simple Interest: SI formula?	SI = (P × R × T) ÷ 100	si-ci
+Simple Interest: Amount = ?	A = P + SI = P(1 + RT/100)	si-ci
+Simple Interest: If SI = CI for 1 year, compare rates?	They are equal for 1 year	si-ci
+Compound Interest: Amount formula?	A = P(1 + r/100)ⁿ	si-ci
+Compound Interest: CI = ?	CI = A − P = P[(1 + r/100)ⁿ − 1]	si-ci
+Compound Interest: Half-yearly amount?	A = P(1 + r/200)^(2n)	si-ci
+Compound Interest: Quarterly amount?	A = P(1 + r/400)^(4n)	si-ci
+Compound Interest: Difference CI − SI for 2 years?	P(r/100)²	si-ci
+Compound Interest: Difference CI − SI for 3 years?	P(r/100)²(r/100 + 3)	si-ci
+Depreciation formula after n years?	Value = P(1 − r/100)ⁿ	si-ci
+
+Time and Work: If A does work in a days, A's 1-day work?	1/a	time-work
+Time and Work: A and B together finish in?	ab ÷ (a + b) days	time-work
+Time and Work: A does work in a days, B in b days. Together in?	ab ÷ (a + b)	time-work
+Time and Work: A is n times as efficient as B. Together finish in?	(B's time) ÷ (n + 1)	time-work
+Time and Work: Pipes: Inlet fills in a hrs, outlet empties in b hrs. Net fill time?	ab ÷ (b − a) hrs (b > a)	time-work
+Time and Work: MDH formula for work?	M₁D₁H₁ ÷ W₁ = M₂D₂H₂ ÷ W₂	time-work
+
+Speed Distance Time: Speed formula?	Speed = Distance ÷ Time	speed-distance
+Speed Distance Time: Average speed for equal distances at x and y?	2xy ÷ (x + y)	speed-distance
+Speed Distance Time: Relative speed — same direction?	|v₁ − v₂|	speed-distance
+Speed Distance Time: Relative speed — opposite direction?	v₁ + v₂	speed-distance
+Speed Distance Time: Train crossing a pole/person — time?	t = Train length ÷ Speed	speed-distance
+Speed Distance Time: Train crossing a platform — time?	t = (Train + Platform length) ÷ Speed	speed-distance
+Speed Distance Time: Boat downstream speed?	b + r (b = boat speed, r = river)	speed-distance
+Speed Distance Time: Boat upstream speed?	b − r	speed-distance
+Speed Distance Time: Boat speed in still water?	(downstream + upstream) ÷ 2	speed-distance
+Speed Distance Time: River current speed?	(downstream − upstream) ÷ 2	speed-distance
+Speed Distance Time: km/h to m/s?	Multiply by 5/18	speed-distance
+Speed Distance Time: m/s to km/h?	Multiply by 18/5	speed-distance
+
+Number System: HCF × LCM = ?	Product of the two numbers	number-system
+Number System: Sum of 1 to n?	n(n+1) ÷ 2	number-system
+Number System: Sum of squares 1² to n²?	n(n+1)(2n+1) ÷ 6	number-system
+Number System: Sum of cubes 1³ to n³?	[n(n+1) ÷ 2]²	number-system
+Number System: Sum of first n odd numbers?	n²	number-system
+Number System: Sum of first n even numbers?	n(n+1)	number-system
+Number System: Divisibility by 3?	Sum of digits divisible by 3	number-system
+Number System: Divisibility by 9?	Sum of digits divisible by 9	number-system
+Number System: Divisibility by 11?	(Sum of odd-position digits) − (Sum of even-position digits) divisible by 11	number-system
+Number System: Divisibility by 7?	Double last digit, subtract from rest; repeat until easy to check	number-system
+Number System: Number of factors of p^a × q^b × r^c?	(a+1)(b+1)(c+1)	number-system
+Number System: Unit digit of 2 follows cycle?	2,4,8,6 (cycle of 4)	number-system
+Number System: Unit digit of 3 follows cycle?	3,9,7,1 (cycle of 4)	number-system
+Number System: Unit digit of 7 follows cycle?	7,9,3,1 (cycle of 4)	number-system
+Number System: Unit digit of 4 follows cycle?	4,6 (cycle of 2)	number-system
+Number System: Unit digit of 9 follows cycle?	9,1 (cycle of 2)	number-system
+
+Geometry: Area of triangle?	½ × base × height	geometry
+Geometry: Heron's formula — area of triangle (sides a,b,c)?	√[s(s−a)(s−b)(s−c)], s = (a+b+c)/2	geometry
+Geometry: Area of equilateral triangle (side a)?	(√3/4)a²	geometry
+Geometry: Area of circle?	πr²	geometry
+Geometry: Circumference of circle?	2πr	geometry
+Geometry: Area of sector (angle θ in degrees)?	(θ/360) × πr²	geometry
+Geometry: Arc length (angle θ in degrees)?	(θ/360) × 2πr	geometry
+Geometry: Area of trapezoid?	½ × (sum of parallel sides) × height	geometry
+Geometry: Pythagoras theorem?	a² + b² = c² (c = hypotenuse)	geometry
+Geometry: Pythagorean triple (3-4-5 family)?	3-4-5, 6-8-10, 5-12-13, 7-24-25, 8-15-17, 9-40-41	geometry
+Geometry: Angle in semicircle?	90°	geometry
+Geometry: Tangent from external point P — length formula?	PT² = PA × PB (secant-tangent)	geometry
+Geometry: Tangent-radius relationship?	Tangent ⊥ radius at point of contact	geometry
+Geometry: Exterior angle of triangle = ?	Sum of two non-adjacent interior angles	geometry
+Geometry: Sum of all interior angles of n-sided polygon?	(n − 2) × 180°	geometry
+Geometry: Each interior angle of regular n-gon?	(n − 2) × 180° ÷ n	geometry
+
+Mensuration: Cube — Volume?	a³	mensuration
+Mensuration: Cube — Surface Area?	6a²	mensuration
+Mensuration: Cube — Diagonal?	a√3	mensuration
+Mensuration: Cuboid — Volume?	l × b × h	mensuration
+Mensuration: Cuboid — Total Surface Area?	2(lb + bh + lh)	mensuration
+Mensuration: Cuboid — Diagonal?	√(l² + b² + h²)	mensuration
+Mensuration: Cylinder — Volume?	πr²h	mensuration
+Mensuration: Cylinder — Curved Surface Area?	2πrh	mensuration
+Mensuration: Cylinder — Total Surface Area?	2πr(r + h)	mensuration
+Mensuration: Cone — Volume?	⅓πr²h	mensuration
+Mensuration: Cone — Curved Surface Area?	πrl, where l = slant height = √(r² + h²)	mensuration
+Mensuration: Cone — Total Surface Area?	πr(r + l)	mensuration
+Mensuration: Sphere — Volume?	(4/3)πr³	mensuration
+Mensuration: Sphere — Surface Area?	4πr²	mensuration
+Mensuration: Hemisphere — Volume?	(2/3)πr³	mensuration
+Mensuration: Hemisphere — Curved Surface Area?	2πr²	mensuration
+Mensuration: Hemisphere — Total Surface Area?	3πr²	mensuration
+
+Trigonometry: sin²θ + cos²θ = ?	1	trigonometry
+Trigonometry: 1 + tan²θ = ?	sec²θ	trigonometry
+Trigonometry: 1 + cot²θ = ?	cosec²θ	trigonometry
+Trigonometry: sin(90° − θ) = ?	cosθ	trigonometry
+Trigonometry: cos(90° − θ) = ?	sinθ	trigonometry
+Trigonometry: tan(90° − θ) = ?	cotθ	trigonometry
+Trigonometry: sin 0° = ?	0	trigonometry
+Trigonometry: sin 30° = ?	1/2	trigonometry
+Trigonometry: sin 45° = ?	1/√2 = √2/2	trigonometry
+Trigonometry: sin 60° = ?	√3/2	trigonometry
+Trigonometry: sin 90° = ?	1	trigonometry
+Trigonometry: cos 0° = ?	1	trigonometry
+Trigonometry: cos 30° = ?	√3/2	trigonometry
+Trigonometry: cos 45° = ?	1/√2 = √2/2	trigonometry
+Trigonometry: cos 60° = ?	1/2	trigonometry
+Trigonometry: cos 90° = ?	0	trigonometry
+Trigonometry: tan 0° = ?	0	trigonometry
+Trigonometry: tan 30° = ?	1/√3	trigonometry
+Trigonometry: tan 45° = ?	1	trigonometry
+Trigonometry: tan 60° = ?	√3	trigonometry
+Trigonometry: tan 90° = ?	Undefined	trigonometry
+Trigonometry: sinA · cosecA = ?	1	trigonometry
+Trigonometry: cosA · secA = ?	1	trigonometry
+Trigonometry: tanA · cotA = ?	1	trigonometry
+
+Averages: Average formula?	Sum of items ÷ Number of items	averages
+Averages: If average of n items is A and one item x is replaced by y, new average?	A + (y − x)/n	averages
+Averages: Average of first n natural numbers?	(n + 1) ÷ 2	averages
+Averages: Average of first n odd numbers?	n	averages
+Averages: Average of first n even numbers?	n + 1	averages
+Averages: Average of n consecutive numbers starting at a?	a + (n−1)/2	averages
+
+Ratio and Proportion: If a:b = c:d, then?	ad = bc (cross-product rule)	ratio
+Ratio and Proportion: Mean proportion of a and b?	√(ab)	ratio
+Ratio and Proportion: Third proportion of a and b?	b²/a	ratio
+Ratio and Proportion: If ratio is a:b, A gets how much of total T?	T × a/(a+b)	ratio
+Ratio and Proportion: Componendo: (a+b)/(a−b) = ?	(c+d)/(c−d), if a/b = c/d	ratio
+Ratio and Proportion: Dividendo: (a−b)/b = ?	(c−d)/d, if a/b = c/d	ratio
+
+Mixture and Alligation: Alligation rule — cheaper (c), dearer (d), mean (m)?	(d−m)/(m−c) = quantity of cheaper / quantity of dearer	mixture
+Mixture and Alligation: Replacement formula — x litres removed from V litres n times?	Remaining pure = V × (1 − x/V)ⁿ	mixture
+Mixture and Alligation: Final concentration after n replacements (x/V each time)?	C × (1 − x/V)ⁿ	mixture
+
+Progressions: nth term of AP?	a + (n−1)d	progressions
+Progressions: Sum of n terms of AP?	n/2 × [2a + (n−1)d] = n/2 × (first + last)	progressions
+Progressions: nth term of GP?	a × rⁿ⁻¹	progressions
+Progressions: Sum of n terms of GP (r ≠ 1)?	a(rⁿ − 1)/(r − 1)	progressions
+Progressions: Sum of infinite GP (|r| < 1)?	a/(1 − r)	progressions
+
+Permutation and Combination: nPr = ?	n! ÷ (n−r)!	p-and-c
+Permutation and Combination: nCr = ?	n! ÷ [r!(n−r)!]	p-and-c
+Permutation and Combination: nC0 = nCn = ?	1	p-and-c
+Permutation and Combination: nCr = nC(n−r) = ?	True (symmetry)	p-and-c
+Permutation and Combination: nCr + nC(r−1) = ?	(n+1)Cr	p-and-c
+
+Clocks: Minute hand speed vs hour hand?	Minute hand gains 5.5° per minute over hour hand	clocks
+Clocks: Angle between hands at H hours M minutes?	|30H − 5.5M|°	clocks
+Clocks: Hands overlap every?	65 5/11 minutes (≈ 65.45 min)	clocks
+Clocks: In 12 hours, hands coincide?	11 times	clocks
+Clocks: In 24 hours, hands coincide?	22 times	clocks
+
+Pipes and Cisterns: Pipe A fills in a hrs, pipe B fills in b hrs, together?	ab/(a+b) hrs	pipes
+Pipes and Cisterns: Inlet fills in a hrs, outlet empties in b hrs (b > a), net fill time?	ab/(b−a) hrs	pipes
