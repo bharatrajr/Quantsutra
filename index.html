@@ -1038,6 +1038,7 @@ const MODS=[
   {id:'sqroots',ic:'√n',name:'Square Roots',desc:'√1 to √400 — all 20 perfect square roots',bank:()=>SQRT_BANK,subs:[{id:'sqrt',lb:'All √1–√400'}],tag:'Square Roots',tot:20},
   {id:'percentages',ic:'%',name:'Percentages',desc:'X% of Y · What % is X of Y · dynamic',bank:()=>genPctBank(),subs:[{id:'pct1',lb:'X% of Y'},{id:'pct2',lb:'% of what'}],tag:'Percentages',tot:'∞',isDynamic:true},
   {id:'vedic',ic:'⚡',name:'Vedic Tricks',desc:'×11 · ×25 · ×99 · ×101 · Sq.n5 · a²−b² · ~50² · 1…n · Succ%',bank:()=>genVedic(),subs:[{id:'v11',lb:'×11'},{id:'v25',lb:'×25'},{id:'v99',lb:'×99'},{id:'v101',lb:'×101'},{id:'vsq5',lb:'Sq.n5'},{id:'vdiffsq',lb:'a²−b²'},{id:'vsq50',lb:'~50²'},{id:'vsum',lb:'1…n'},{id:'vsucc',lb:'Succ%'}],tag:'Vedic Tricks',tot:'~105'},
+  {id:'formulas',ic:'📐',name:'Formulas',desc:'Algebra · % · SI/CI · Geometry · Trig · 90+ flashcards',bank:()=>genFormulaBank(),subs:[{id:'all',lb:'All Topics'}],tag:'Formulas',tot:'90+',defaultMode:'flash'},
 ];
 
 /* ══════════════════════════════════
@@ -1152,7 +1153,7 @@ function openCfg(id){
   document.getElementById('cfg-ic').textContent=cfgMod.ic;
   document.getElementById('cfg-nm').textContent=cfgMod.name;
   document.getElementById('cfg-ds').textContent=cfgMod.desc;
-  setMode('type');
+  setMode(cfgMod.defaultMode||'type');
   // Table difficulty preset
   const isTable=cfgMod.hasDiff;
   document.getElementById('tbl-diff-sec').style.display=isTable?'':'none';
@@ -1624,6 +1625,11 @@ const FORMULA_TOPICS=[
   {t:'Averages · Ratio · Mixture',rows:[['Average','Sum÷Count'],['New avg (replace x→y)','A+(y−x)/n'],['Mean proportion of a,b','√(ab)'],['Alligation (c cheaper, d dearer, m mean)','(d−m):(m−c) = cheaper:dearer qty'],['Replacement (x/V removed n times)','V×(1−x/V)ⁿ remaining']]},
   {t:'AP · GP · P&C · Clocks',rows:[['AP nth term','a+(n−1)d'],['AP sum n terms','n/2×[2a+(n−1)d]'],['GP nth term','a·rⁿ⁻¹'],['GP sum n terms','a(rⁿ−1)÷(r−1)'],['Infinite GP (|r|<1)','a÷(1−r)'],['nPr','n!÷(n−r)!'],['nCr','n!÷[r!(n−r)!]'],['Angle (H hrs, M min)','|30H−5.5M|°'],['Hands coincide in 12 hrs','11 times']]}
 ];
+function genFormulaBank(){
+  return FORMULA_TOPICS.flatMap(({t,rows},ti)=>
+    rows.map(([f,v],i)=>({q:f+' = ?',qh:f+' = ?',a:v,hint:t,sub:'all',tag:t,key:'fml_'+ti+'_'+i}))
+  );
+}
 function renderRefTables(){
   const fref=document.getElementById('formula-ref');
   if(fref)fref.innerHTML='<div class="refsec"><h3 style="color:var(--red);font-size:.9rem">📐 SSC CGL Math Formulas</h3></div>'+FORMULA_TOPICS.map(({t,rows})=>`<div class="refsec"><h3>${t}</h3><div class="refcard"><table class="rt"><tbody>${rows.map(([f,v])=>`<tr><td>${f}</td><td class="b" style="font-size:.78rem">${v}</td></tr>`).join('')}</tbody></table></div></div>`).join('');
