@@ -404,6 +404,8 @@ input{outline:none;font-family:inherit;}
 .bmark-btn{position:absolute;top:8px;left:10px;width:32px;height:32px;background:var(--card);border:1.5px solid var(--border);border-radius:50%;font-size:1rem;cursor:pointer;z-index:3;opacity:.85;transition:opacity .15s,transform .12s,background .15s;line-height:1;padding:0;display:flex;align-items:center;justify-content:center;}
 .bmark-btn:active{transform:scale(.82);}
 .bmark-btn.saved{opacity:1;background:rgba(184,134,11,.18);border-color:var(--yellow);}
+.suspend-btn{position:absolute;bottom:8px;right:10px;width:28px;height:28px;background:var(--card);border:1.5px solid var(--border);border-radius:50%;font-size:.78rem;cursor:pointer;z-index:3;opacity:.65;transition:opacity .15s,transform .12s;line-height:1;padding:0;display:flex;align-items:center;justify-content:center;}
+.suspend-btn:active{transform:scale(.82);}
 .bmark-banner{background:linear-gradient(135deg,rgba(184,134,11,.08),transparent);border:1.5px solid rgba(184,134,11,.28);border-radius:var(--r);padding:13px 15px;margin-bottom:14px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:all .18s;}
 .bmark-banner:active{transform:scale(.985);}
 .bmark-banner .gb-title{color:var(--yellow);}
@@ -583,7 +585,7 @@ input{outline:none;font-family:inherit;}
       <div class="cfg-ic" id="cfg-ic">n²</div>
       <div><h2 id="cfg-nm">Squares</h2><p id="cfg-ds">desc</p></div>
     </div>
-    <div class="csec">
+    <div class="csec" id="mode-sec">
       <h3>Practice Mode</h3>
       <div class="mgrid">
         <button class="mbtn on" id="m-type" onclick="setMode('type')"><div class="mi">⌨️</div><div class="mn">Type</div><div class="md">Type answer</div></button>
@@ -648,6 +650,7 @@ input{outline:none;font-family:inherit;}
     <div class="ctag" id="d-tag">Squares</div>
     <div class="qcard" id="qcard">
       <button class="bmark-btn" id="bmark-btn" onclick="toggleBookmark()" title="Bookmark">🔖</button>
+      <button class="suspend-btn" id="suspend-btn" onclick="suspendFormula()" title="Suspend — hide this card" style="display:none">🚫</button>
       <div class="streak-badge" id="streak-badge">🔥 ×2</div>
       <div class="qtext" id="d-q">—</div>
       <div class="qhint" id="d-hint" style="display:none"></div>
@@ -841,7 +844,7 @@ input{outline:none;font-family:inherit;}
 const SK='quantsutra_v4';
 function load(){try{return JSON.parse(localStorage.getItem(SK))||def();}catch{return def();}}
 function save(){localStorage.setItem(SK,JSON.stringify(D));}
-function def(){return{streak:0,lastDate:null,mods:{},leaderboard:[],wrongHistory:{},sessions:[],dailyGoal:50,dailyDone:0,dailyDate:null,soundOn:false,darkOn:false,bookmarks:{}};}
+function def(){return{streak:0,lastDate:null,mods:{},leaderboard:[],wrongHistory:{},sessions:[],dailyGoal:50,dailyDone:0,dailyDate:null,soundOn:false,darkOn:false,bookmarks:{},suspendedFormulas:{}};}
 let D=load();
 function ms(id){if(!D.mods[id])D.mods[id]={att:0,cor:0};return D.mods[id];}
 
@@ -1038,7 +1041,7 @@ const MODS=[
   {id:'sqroots',ic:'√n',name:'Square Roots',desc:'√1 to √400 — all 20 perfect square roots',bank:()=>SQRT_BANK,subs:[{id:'sqrt',lb:'All √1–√400'}],tag:'Square Roots',tot:20},
   {id:'percentages',ic:'%',name:'Percentages',desc:'X% of Y · What % is X of Y · dynamic',bank:()=>genPctBank(),subs:[{id:'pct1',lb:'X% of Y'},{id:'pct2',lb:'% of what'}],tag:'Percentages',tot:'∞',isDynamic:true},
   {id:'vedic',ic:'⚡',name:'Vedic Tricks',desc:'×11 · ×25 · ×99 · ×101 · Sq.n5 · a²−b² · ~50² · 1…n · Succ%',bank:()=>genVedic(),subs:[{id:'v11',lb:'×11'},{id:'v25',lb:'×25'},{id:'v99',lb:'×99'},{id:'v101',lb:'×101'},{id:'vsq5',lb:'Sq.n5'},{id:'vdiffsq',lb:'a²−b²'},{id:'vsq50',lb:'~50²'},{id:'vsum',lb:'1…n'},{id:'vsucc',lb:'Succ%'}],tag:'Vedic Tricks',tot:'~105'},
-  {id:'formulas',ic:'📐',name:'Formulas',desc:'Algebra · % · SI/CI · Geometry · Trig · 90+ flashcards',bank:()=>genFormulaBank(),subs:[{id:'all',lb:'All Topics'}],tag:'Formulas',tot:'90+',defaultMode:'flash'},
+  {id:'formulas',ic:'📐',name:'Formulas',desc:'Algebra · % · Geometry · Trig · SI/CI · 130+ Anki flashcards',bank:()=>genFormulaBank(),subs:[{id:'ft0',lb:'Algebra'},{id:'ft1',lb:'Percentage'},{id:'ft2',lb:'Profit & Loss'},{id:'ft3',lb:'SI & CI'},{id:'ft4',lb:'Time & Work'},{id:'ft5',lb:'Speed & Distance'},{id:'ft6',lb:'Number System'},{id:'ft7',lb:'Geometry'},{id:'ft8',lb:'Mensuration'},{id:'ft9',lb:'Trigonometry'},{id:'ft10',lb:'Avg & Ratio'},{id:'ft11',lb:'AP/GP/P&C'},{id:'ft12',lb:'Calendars'}],tag:'Formulas',tot:'130+',forceFlash:true},
 ];
 
 /* ══════════════════════════════════
@@ -1153,7 +1156,9 @@ function openCfg(id){
   document.getElementById('cfg-ic').textContent=cfgMod.ic;
   document.getElementById('cfg-nm').textContent=cfgMod.name;
   document.getElementById('cfg-ds').textContent=cfgMod.desc;
-  setMode(cfgMod.defaultMode||'type');
+  const forcedMode=cfgMod.forceFlash?'flash':(cfgMod.defaultMode||'type');
+  setMode(forcedMode);
+  document.getElementById('mode-sec').style.display=cfgMod.forceFlash?'none':'';
   // Table difficulty preset
   const isTable=cfgMod.hasDiff;
   document.getElementById('tbl-diff-sec').style.display=isTable?'':'none';
@@ -1243,7 +1248,7 @@ function startDrill(){
     bank=shuffle(bank);
     if(cfg.cnt>0)bank=bank.slice(0,cfg.cnt);
   }
-  S={mod,mode:cfg.mode,bank,idx:0,ok:0,no:0,sk:0,wrongList:[],answered:false,isGame:false,isBlitz:false,isExam:cfg.mode==='exam',score:0,lives:3,consec:0,multiplier:1,qTimer:null,speedSec:0,examLog:[],isDynamic:mod.isDynamic||false,responseTimes:[],sessionStart:Date.now()};
+  S={mod,mode:cfg.mode,bank,idx:0,ok:0,no:0,sk:0,wrongList:[],answered:false,isGame:false,isBlitz:false,isExam:cfg.mode==='exam',isFormulas:mod.id==='formulas',score:0,lives:3,consec:0,multiplier:1,qTimer:null,speedSec:0,examLog:[],isDynamic:mod.isDynamic||false,responseTimes:[],sessionStart:Date.now()};
   initUI(mod.name,cfg.mode,false);loadQ();
 }
 function startGameMode(){
@@ -1314,6 +1319,11 @@ function loadQ(){
   const q=S.bank[S.idx];
   S.answered=false;S.currentQ=q;S.qStartTime=Date.now();
   setTimeout(updBmarkBtn,0);
+  const sbtn=document.getElementById('suspend-btn');
+  if(sbtn)sbtn.style.display=S.isFormulas?'flex':'none';
+  const qcard=document.getElementById('qcard');
+  if(S.mode==='flash'){qcard.style.cursor='pointer';qcard.onclick=()=>{if(!S.answered)flReveal();};}
+  else{qcard.style.cursor='';qcard.onclick=null;}
   document.getElementById('d-tag').textContent=q.tag;
   document.getElementById('d-q').innerHTML=q.qh||q.q;
   const ht=document.getElementById('d-hint');
@@ -1613,22 +1623,25 @@ function renderModStats(){
 }
 
 const FORMULA_TOPICS=[
-  {t:'Algebra',rows:[['(a+b)²','a²+2ab+b²'],['(a−b)²','a²−2ab+b²'],['(a+b)³','a³+3a²b+3ab²+b³'],['(a−b)³','a³−3a²b+3ab²−b³'],['a²−b²','(a+b)(a−b)'],['a³+b³','(a+b)(a²−ab+b²)'],['a³−b³','(a−b)(a²+ab+b²)'],['(a+b+c)²','a²+b²+c²+2ab+2bc+2ca'],['a+b+c=0 ⟹ a³+b³+c³','3abc']]},
-  {t:'Profit & Loss',rows:[['Profit%','(Profit÷CP)×100'],['SP (Profit P%)','CP×(100+P%)÷100'],['CP from SP & P%','SP×100÷(100+P%)'],['SP (Loss L%)','CP×(100−L%)÷100'],['SP with Discount d%','MP×(100−d%)÷100'],['Successive discounts a%,b%','a+b−ab÷100'],['Price up r% → restore fall','100r÷(100+r)'],['Price down r% → restore rise','100r÷(100−r)']]},
-  {t:'Simple & Compound Interest',rows:[['SI','P×R×T÷100'],['Amount (SI)','P(1+RT/100)'],['CI Amount','P(1+r/100)ⁿ'],['CI half-yearly','P(1+r/200)²ⁿ'],['CI quarterly','P(1+r/400)⁴ⁿ'],['CI−SI (2 yrs)','P(r/100)²'],['CI−SI (3 yrs)','P(r/100)²×(r/100+3)'],['Depreciation','P(1−r/100)ⁿ']]},
-  {t:'Time & Work',rows:[['A does in a days → 1-day work','1/a'],['A(a days)+B(b days) together','ab÷(a+b) days'],['A is n× efficient as B, together','B÷(n+1) days'],['MDH formula','M₁D₁H₁/W₁ = M₂D₂H₂/W₂'],['Inlet(a)+Outlet(b hrs) net fill','ab÷(b−a) hrs']]},
-  {t:'Speed · Distance · Time',rows:[['Average speed (equal dist)','2xy÷(x+y)'],['Relative speed (same dir)','|v₁−v₂|'],['Relative speed (opp dir)','v₁+v₂'],['Train × pole','Length÷Speed'],['Train × platform','(Train+Platform)÷Speed'],['Boat downstream','b+r'],['Boat upstream','b−r'],['Boat still-water speed','(D+U)÷2'],['River current','(D−U)÷2'],['km/h → m/s','×5/18'],['m/s → km/h','×18/5']]},
-  {t:'Number System',rows:[['HCF×LCM','Product of two numbers'],['Σ 1 to n','n(n+1)÷2'],['Σ 1²..n²','n(n+1)(2n+1)÷6'],['Σ 1³..n³','[n(n+1)÷2]²'],['Σ first n odd','n²'],['Σ first n even','n(n+1)'],['Factors of p^a·q^b·r^c','(a+1)(b+1)(c+1)'],['Unit digit cycle 2','2,4,8,6'],['Unit digit cycle 3','3,9,7,1'],['Unit digit cycle 7','7,9,3,1'],['Div by 11','Odd-pos sum − Even-pos sum = 0']]},
-  {t:'Geometry',rows:[['Area triangle','½×base×height'],['Heron\'s (s=(a+b+c)/2)','√[s(s−a)(s−b)(s−c)]'],['Equilateral triangle','(√3/4)a²'],['Circle area','πr²'],['Circumference','2πr'],['Sector area (θ°)','(θ/360)πr²'],['Arc length (θ°)','(θ/360)2πr'],['Exterior angle','Sum of 2 non-adj interior angles'],['Interior angles sum (n-gon)','(n−2)×180°'],['Each angle regular n-gon','(n−2)×180÷n']]},
-  {t:'Mensuration (3D)',rows:[['Cube volume','a³'],['Cube SA','6a²'],['Cube diagonal','a√3'],['Cuboid volume','l×b×h'],['Cuboid TSA','2(lb+bh+lh)'],['Cylinder volume','πr²h'],['Cylinder CSA','2πrh'],['Cone volume','⅓πr²h'],['Cone CSA (l=slant)','πrl'],['Sphere volume','(4/3)πr³'],['Sphere SA','4πr²'],['Hemisphere CSA','2πr²']]},
-  {t:'Trigonometry',rows:[['sin²θ+cos²θ','1'],['1+tan²θ','sec²θ'],['1+cot²θ','cosec²θ'],['sin(90−θ)','cosθ'],['cos(90−θ)','sinθ'],['0° / 30° / 45° / 60° / 90° sin','0, ½, 1/√2, √3/2, 1'],['0° / 30° / 45° / 60° / 90° cos','1, √3/2, 1/√2, ½, 0'],['0° / 30° / 45° / 60° tan','0, 1/√3, 1, √3']]},
-  {t:'Averages · Ratio · Mixture',rows:[['Average','Sum÷Count'],['New avg (replace x→y)','A+(y−x)/n'],['Mean proportion of a,b','√(ab)'],['Alligation (c cheaper, d dearer, m mean)','(d−m):(m−c) = cheaper:dearer qty'],['Replacement (x/V removed n times)','V×(1−x/V)ⁿ remaining']]},
-  {t:'AP · GP · P&C · Clocks',rows:[['AP nth term','a+(n−1)d'],['AP sum n terms','n/2×[2a+(n−1)d]'],['GP nth term','a·rⁿ⁻¹'],['GP sum n terms','a(rⁿ−1)÷(r−1)'],['Infinite GP (|r|<1)','a÷(1−r)'],['nPr','n!÷(n−r)!'],['nCr','n!÷[r!(n−r)!]'],['Angle (H hrs, M min)','|30H−5.5M|°'],['Hands coincide in 12 hrs','11 times']]}
+  {t:'Algebra',rows:[['(a+b)²','a²+2ab+b²'],['(a−b)²','a²−2ab+b²'],['(a+b)(a−b)','a²−b²'],['(a+b)³','a³+3a²b+3ab²+b³'],['(a−b)³','a³−3a²b+3ab²−b³'],['a³+b³','(a+b)(a²−ab+b²)'],['a³−b³','(a−b)(a²+ab+b²)'],['(a+b+c)²','a²+b²+c²+2ab+2bc+2ca'],['a³+b³+c³−3abc','(a+b+c)(a²+b²+c²−ab−bc−ca)'],['If a+b+c=0 → a³+b³+c³','3abc'],['(x+a)(x+b)','x²+(a+b)x+ab']]},
+  {t:'Percentage',rows:[['% change','(New−Old)÷Old × 100'],['x% of y = y% of x','TRUE'],['% error','Error÷True value × 100'],['A is r% more than B → B is __% less than A','100r÷(100+r)'],['A is r% less than B → B is __% more than A','100r÷(100−r)'],['Price up r% → consumption fall to maintain spend','100r÷(100+r) %'],['Price down r% → consumption rise to maintain spend','100r÷(100−r) %'],['Population after n years','P×(1+r/100)ⁿ'],['Population n years ago','P÷(1+r/100)ⁿ']]},
+  {t:'Profit & Loss',rows:[['Profit%','(Profit÷CP)×100'],['SP (Profit P%)','CP×(100+P%)÷100'],['CP from SP & P%','SP×100÷(100+P%)'],['SP (Loss L%)','CP×(100−L%)÷100'],['MP→SP with discount d%','MP×(100−d%)÷100'],['Successive discounts a%,b%','a+b−ab÷100 net %'],['Two items same SP, one +p% one −p% → net','Loss = p²÷100 %'],['Dishonest: weighs x g instead of y g → profit%','(y−x)÷x × 100'],['Mark up M%, discount D% → net profit%','M−D−MD÷100']]},
+  {t:'SI & CI',rows:[['SI','P×R×T÷100'],['A (SI)','P+SI = P(1+RT/100)'],['CI amount','P(1+r/100)ⁿ'],['CI half-yearly','P(1+r/200)²ⁿ'],['CI quarterly','P(1+r/400)⁴ⁿ'],['CI−SI (2 yrs)','P(r/100)²'],['CI−SI (3 yrs)','P(r/100)²×(r/100+3)'],['Depreciation after n yrs','P(1−r/100)ⁿ'],['Effective annual rate (half-yearly r%)','(1+r/200)²−1 ×100']]},
+  {t:'Time & Work',rows:[['A does in a days → 1-day work','1/a'],['A+B together','ab÷(a+b) days'],['A is n× efficient as B, together','B÷(n+1) days'],['MDH formula','M₁D₁H₁/W₁ = M₂D₂H₂/W₂'],['Inlet(a hrs)+Outlet(b hrs) net fill time','ab÷(b−a) hrs'],['A alone a days, B leaves d days early → total','a(b+d)÷(a+b)'],['Pipes A(p hrs) B(q hrs) C empties(r hrs) together','pqr÷(qr+pr−pq) hrs']]},
+  {t:'Speed & Distance',rows:[['Average speed (equal dist at x,y)','2xy÷(x+y)'],['Relative speed (same direction)','|v₁−v₂|'],['Relative speed (opposite direction)','v₁+v₂'],['Train crossing a pole','Train length ÷ Speed'],['Train crossing platform','(Train+Platform) ÷ Speed'],['Two trains cross (opp dir)','(L₁+L₂)÷(v₁+v₂)'],['Boat downstream','b+r'],['Boat upstream','b−r'],['Boat still-water speed','(D+U)÷2'],['Stream speed','(D−U)÷2'],['km/h → m/s','×5/18'],['m/s → km/h','×18/5'],['Speed up r% → time saved','100r÷(100+r) %']]},
+  {t:'Number System',rows:[['HCF×LCM','= product of two numbers'],['Σ 1 to n','n(n+1)÷2'],['Σ 1² to n²','n(n+1)(2n+1)÷6'],['Σ 1³ to n³','[n(n+1)÷2]²'],['Σ first n odd','n²'],['Σ first n even','n(n+1)'],['Number of factors of p^a·q^b','(a+1)(b+1)'],['Unit digit cycle: 2','2,4,8,6 (period 4)'],['Unit digit cycle: 3,7','3,9,7,1 and 7,9,3,1 (period 4)'],['Unit digit cycle: 4','4,6 (period 2)'],['Div by 11','Alternating digit sum = 0 or ±11'],['Div by 7','Double last digit, subtract from rest; repeat'],['Euler φ(p) for prime p','p−1'],['Fermat: a^(p-1) mod p (p prime)','≡ 1']]},
+  {t:'Geometry',rows:[['Area triangle','½×base×height'],["Heron's (s=(a+b+c)/2)",'√[s(s−a)(s−b)(s−c)]'],['Equilateral triangle area / height','(√3/4)a² / (√3/2)a'],['Circle area / circumference','πr² / 2πr'],['Sector area (θ°)','(θ/360)×πr²'],['Arc length (θ°)','(θ/360)×2πr'],['Tangent–radius angle','90°'],['Two tangents from external point','Equal in length'],['Angle in semicircle','90°'],['Inscribed angle','= ½ central angle (same arc)'],['Cyclic quad opp angles','Sum = 180°'],['Exterior angle of triangle','Sum of 2 non-adj interior angles'],['Interior angles sum (n-gon)','(n−2)×180°'],['Centroid divides median','2:1 from vertex'],['Angle bisector from A divides BC','AB:AC'],['Median to hypotenuse (right △)','= Hypotenuse÷2']]},
+  {t:'Mensuration',rows:[['Cube: volume / SA / diagonal','a³ / 6a² / a√3'],['Cuboid: volume / TSA / diagonal','lbh / 2(lb+bh+lh) / √(l²+b²+h²)'],['Cylinder: volume / CSA / TSA','πr²h / 2πrh / 2πr(r+h)'],['Cone: volume / CSA (l=slant)','⅓πr²h / πrl, l=√(r²+h²)'],['Sphere: volume / SA','(4/3)πr³ / 4πr²'],['Hemisphere: volume / CSA / TSA','(2/3)πr³ / 2πr² / 3πr²'],['Frustum volume (r₁,r₂,h)','πh(r₁²+r₂²+r₁r₂)÷3'],['Prism volume','Base area × height'],['Pyramid volume','(1/3)×Base area×height'],['Area of trapezoid','½(a+b)×h']]},
+  {t:'Trigonometry',rows:[['sin²θ+cos²θ','1'],['1+tan²θ','sec²θ'],['1+cot²θ','cosec²θ'],['sin(90−θ)','cosθ'],['cos(90−θ)','sinθ'],['sin(A+B)','sinAcosB+cosAsinB'],['sin(A−B)','sinAcosB−cosAsinB'],['cos(A+B)','cosAcosB−sinAsinB'],['cos(A−B)','cosAcosB+sinAsinB'],['sin2A','2sinAcosA'],['cos2A','cos²A−sin²A = 1−2sin²A'],['tan2A','2tanA÷(1−tan²A)'],['sin 30°/45°/60°','½, 1/√2, √3/2'],['cos 30°/45°/60°','√3/2, 1/√2, ½'],['tan 30°/45°/60°','1/√3, 1, √3']]},
+  {t:'Avg & Ratio',rows:[['Average','Sum÷Count'],['Replace x with y → new avg','A+(y−x)÷n'],['Avg of 1 to n','(n+1)÷2'],['Avg of first n odd','n'],['Avg of first n even','n+1'],['Weighted avg (n₁,A₁ and n₂,A₂)','(n₁A₁+n₂A₂)÷(n₁+n₂)'],['Mean proportion of a,b','√(ab)'],['Third proportion of a,b','b²÷a'],['a:b=c:d → ad','= bc'],['Alligation (cheaper c, dearer d, mean m)','(d−m):(m−c) = cheap:dear qty'],['Replacement (remove x L from V L, n times)','Remaining = V×(1−x/V)ⁿ'],['Partnership profit share','∝ Capital × Time']]},
+  {t:'AP/GP/P&C',rows:[['AP nth term','a+(n−1)d'],['AP sum n terms','n/2×(2a+(n−1)d)'],['AP: sum = n/2×','(first + last)'],['GP nth term','a·rⁿ⁻¹'],['GP sum n terms','a(rⁿ−1)÷(r−1)'],['Infinite GP (|r|<1)','a÷(1−r)'],['nPr','n!÷(n−r)!'],['nCr','n!÷(r!(n−r)!)'],['nC0 = nCn','1'],['nCr + nC(r−1)','= (n+1)Cr'],['Clock angle (H hrs, M min)','|30H−5.5M|°'],['Hands overlap every','65 5/11 min ≈ 65.45 min'],['Hands coincide in 12 hrs','11 times'],['Hands at 90° in 12 hrs','22 times']]},
+  {t:'Calendars',rows:[['Odd days: ordinary year','1'],['Odd days: leap year','2'],['Odd days: 100 years','5'],['Odd days: 200 years','3'],['Odd days: 300 years','1'],['Odd days: 400 years','0'],['Leap year rule','Div by 400, OR div by 4 but not 100'],['1 Jan 1900 was','Monday'],['Odd days code: 0,1,2,3,4,5,6','Sun, Mon, Tue, Wed, Thu, Fri, Sat'],['Century years: 1st Jan day for 1900,2000,2100','Wed, Sat, Fri'],['Days in ordinary year','365 (1 odd day)'],['Days in leap year','366 (2 odd days)']]}
 ];
 function genFormulaBank(){
+  if(!D.suspendedFormulas)D.suspendedFormulas={};
   return FORMULA_TOPICS.flatMap(({t,rows},ti)=>
-    rows.map(([f,v],i)=>({q:f+' = ?',qh:f+' = ?',a:v,hint:t,sub:'all',tag:t,key:'fml_'+ti+'_'+i}))
-  );
+    rows.map(([f,v],i)=>({q:f+' = ?',qh:f+' = ?',a:v,hint:null,sub:'ft'+ti,tag:t,key:'fml_'+ti+'_'+i}))
+  ).filter(c=>!D.suspendedFormulas[c.key]);
 }
 function renderRefTables(){
   const fref=document.getElementById('formula-ref');
@@ -1669,6 +1682,14 @@ document.addEventListener('keydown',e=>{
 /* ══════════════════════════════════
    BOOKMARKS
 ══════════════════════════════════ */
+function suspendFormula(){
+  const q=S.currentQ;if(!q||!S.isFormulas)return;
+  if(!D.suspendedFormulas)D.suspendedFormulas={};
+  D.suspendedFormulas[q.key]=1;save();
+  S.bank.splice(S.idx,1);
+  if(S.idx>=S.bank.length){endDrill();return;}
+  showToast('Card suspended');loadQ();
+}
 function bkKey(q){return q.key||btoa(unescape(encodeURIComponent(q.q+'|'+q.a))).slice(0,20);}
 function toggleBookmark(){
   const q=S.currentQ;if(!q)return;
