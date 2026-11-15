@@ -765,6 +765,7 @@ input{outline:none;font-family:inherit;}
     </div>
 
     <div class="hp-pane" id="hp-3">
+      <div id="formula-ref"></div>
       <div class="refsec"><h3>Squares 1–30</h3><div class="refcard"><table class="rt" id="sq-ref"></table></div></div>
       <div class="refsec"><h3>Cubes 1–20</h3><div class="refcard"><table class="rt" id="cb-ref"></table></div></div>
       <div class="refsec"><h3>Powers of 2 (2¹–2¹²)</h3><div class="refcard"><table class="rt" id="pow2-ref"></table></div></div>
@@ -1610,7 +1611,22 @@ function renderModStats(){
   }).join('');
 }
 
+const FORMULA_TOPICS=[
+  {t:'Algebra',rows:[['(a+b)²','a²+2ab+b²'],['(a−b)²','a²−2ab+b²'],['(a+b)³','a³+3a²b+3ab²+b³'],['(a−b)³','a³−3a²b+3ab²−b³'],['a²−b²','(a+b)(a−b)'],['a³+b³','(a+b)(a²−ab+b²)'],['a³−b³','(a−b)(a²+ab+b²)'],['(a+b+c)²','a²+b²+c²+2ab+2bc+2ca'],['a+b+c=0 ⟹ a³+b³+c³','3abc']]},
+  {t:'Profit & Loss',rows:[['Profit%','(Profit÷CP)×100'],['SP (Profit P%)','CP×(100+P%)÷100'],['CP from SP & P%','SP×100÷(100+P%)'],['SP (Loss L%)','CP×(100−L%)÷100'],['SP with Discount d%','MP×(100−d%)÷100'],['Successive discounts a%,b%','a+b−ab÷100'],['Price up r% → restore fall','100r÷(100+r)'],['Price down r% → restore rise','100r÷(100−r)']]},
+  {t:'Simple & Compound Interest',rows:[['SI','P×R×T÷100'],['Amount (SI)','P(1+RT/100)'],['CI Amount','P(1+r/100)ⁿ'],['CI half-yearly','P(1+r/200)²ⁿ'],['CI quarterly','P(1+r/400)⁴ⁿ'],['CI−SI (2 yrs)','P(r/100)²'],['CI−SI (3 yrs)','P(r/100)²×(r/100+3)'],['Depreciation','P(1−r/100)ⁿ']]},
+  {t:'Time & Work',rows:[['A does in a days → 1-day work','1/a'],['A(a days)+B(b days) together','ab÷(a+b) days'],['A is n× efficient as B, together','B÷(n+1) days'],['MDH formula','M₁D₁H₁/W₁ = M₂D₂H₂/W₂'],['Inlet(a)+Outlet(b hrs) net fill','ab÷(b−a) hrs']]},
+  {t:'Speed · Distance · Time',rows:[['Average speed (equal dist)','2xy÷(x+y)'],['Relative speed (same dir)','|v₁−v₂|'],['Relative speed (opp dir)','v₁+v₂'],['Train × pole','Length÷Speed'],['Train × platform','(Train+Platform)÷Speed'],['Boat downstream','b+r'],['Boat upstream','b−r'],['Boat still-water speed','(D+U)÷2'],['River current','(D−U)÷2'],['km/h → m/s','×5/18'],['m/s → km/h','×18/5']]},
+  {t:'Number System',rows:[['HCF×LCM','Product of two numbers'],['Σ 1 to n','n(n+1)÷2'],['Σ 1²..n²','n(n+1)(2n+1)÷6'],['Σ 1³..n³','[n(n+1)÷2]²'],['Σ first n odd','n²'],['Σ first n even','n(n+1)'],['Factors of p^a·q^b·r^c','(a+1)(b+1)(c+1)'],['Unit digit cycle 2','2,4,8,6'],['Unit digit cycle 3','3,9,7,1'],['Unit digit cycle 7','7,9,3,1'],['Div by 11','Odd-pos sum − Even-pos sum = 0']]},
+  {t:'Geometry',rows:[['Area triangle','½×base×height'],['Heron\'s (s=(a+b+c)/2)','√[s(s−a)(s−b)(s−c)]'],['Equilateral triangle','(√3/4)a²'],['Circle area','πr²'],['Circumference','2πr'],['Sector area (θ°)','(θ/360)πr²'],['Arc length (θ°)','(θ/360)2πr'],['Exterior angle','Sum of 2 non-adj interior angles'],['Interior angles sum (n-gon)','(n−2)×180°'],['Each angle regular n-gon','(n−2)×180÷n']]},
+  {t:'Mensuration (3D)',rows:[['Cube volume','a³'],['Cube SA','6a²'],['Cube diagonal','a√3'],['Cuboid volume','l×b×h'],['Cuboid TSA','2(lb+bh+lh)'],['Cylinder volume','πr²h'],['Cylinder CSA','2πrh'],['Cone volume','⅓πr²h'],['Cone CSA (l=slant)','πrl'],['Sphere volume','(4/3)πr³'],['Sphere SA','4πr²'],['Hemisphere CSA','2πr²']]},
+  {t:'Trigonometry',rows:[['sin²θ+cos²θ','1'],['1+tan²θ','sec²θ'],['1+cot²θ','cosec²θ'],['sin(90−θ)','cosθ'],['cos(90−θ)','sinθ'],['0° / 30° / 45° / 60° / 90° sin','0, ½, 1/√2, √3/2, 1'],['0° / 30° / 45° / 60° / 90° cos','1, √3/2, 1/√2, ½, 0'],['0° / 30° / 45° / 60° tan','0, 1/√3, 1, √3']]},
+  {t:'Averages · Ratio · Mixture',rows:[['Average','Sum÷Count'],['New avg (replace x→y)','A+(y−x)/n'],['Mean proportion of a,b','√(ab)'],['Alligation (c cheaper, d dearer, m mean)','(d−m):(m−c) = cheaper:dearer qty'],['Replacement (x/V removed n times)','V×(1−x/V)ⁿ remaining']]},
+  {t:'AP · GP · P&C · Clocks',rows:[['AP nth term','a+(n−1)d'],['AP sum n terms','n/2×[2a+(n−1)d]'],['GP nth term','a·rⁿ⁻¹'],['GP sum n terms','a(rⁿ−1)÷(r−1)'],['Infinite GP (|r|<1)','a÷(1−r)'],['nPr','n!÷(n−r)!'],['nCr','n!÷[r!(n−r)!]'],['Angle (H hrs, M min)','|30H−5.5M|°'],['Hands coincide in 12 hrs','11 times']]}
+];
 function renderRefTables(){
+  const fref=document.getElementById('formula-ref');
+  if(fref)fref.innerHTML='<div class="refsec"><h3 style="color:var(--red);font-size:.9rem">📐 SSC CGL Math Formulas</h3></div>'+FORMULA_TOPICS.map(({t,rows})=>`<div class="refsec"><h3>${t}</h3><div class="refcard"><table class="rt"><tbody>${rows.map(([f,v])=>`<tr><td>${f}</td><td class="b" style="font-size:.78rem">${v}</td></tr>`).join('')}</tbody></table></div></div>`).join('');
   document.getElementById('sq-ref').innerHTML=`<thead><tr><th>n</th><th>n²</th><th>n</th><th>n²</th><th>n</th><th>n²</th></tr></thead><tbody>`+Array.from({length:10},(_,i)=>`<tr><td>${i+1}</td><td class="r">${(i+1)**2}</td><td>${i+11}</td><td class="b">${(i+11)**2}</td><td>${i+21}</td><td class="g">${(i+21)**2}</td></tr>`).join('')+'</tbody>';
   document.getElementById('cb-ref').innerHTML=`<thead><tr><th>n</th><th>n³</th><th>n</th><th>n³</th></tr></thead><tbody>`+Array.from({length:10},(_,i)=>`<tr><td>${i+1}</td><td class="r">${(i+1)**3}</td><td>${i+11}</td><td class="b">${(i+11)**3}</td></tr>`).join('')+'</tbody>';
   document.getElementById('pow2-ref').innerHTML=`<thead><tr><th>n</th><th>2ⁿ</th><th>n</th><th>2ⁿ</th><th>n</th><th>2ⁿ</th><th>n</th><th>2ⁿ</th></tr></thead><tbody>`+Array.from({length:3},(_,i)=>`<tr><td>${i+1}</td><td class="r">${Math.pow(2,i+1)}</td><td>${i+4}</td><td class="b">${Math.pow(2,i+4)}</td><td>${i+7}</td><td class="g">${Math.pow(2,i+7)}</td><td>${i+10}</td><td class="r">${Math.pow(2,i+10)}</td></tr>`).join('')+`<tr><td colspan="6"></td><td>12</td><td class="b">${Math.pow(2,12)}</td></tr>`+'</tbody>';
