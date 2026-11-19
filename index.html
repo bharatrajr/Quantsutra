@@ -431,12 +431,8 @@ input{outline:none;font-family:inherit;}
 .fa-card{background:var(--card);border:1.5px solid var(--border);border-radius:16px;min-height:46vh;padding:28px 22px 20px;margin:0 14px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;transition:border-color .15s;-webkit-tap-highlight-color:transparent;overflow-x:auto;}
 .fa-card:active{transform:scale(.99);}
 .fa-side{display:flex;flex-direction:column;align-items:center;width:100%;}
-.fa-label{font-size:.62rem;font-family:var(--fm);font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;}
-.fa-ans-label{color:var(--green);}
 .fa-math{font-size:1.1rem;line-height:1.75;text-align:center;color:var(--ink);word-break:break-word;overflow-wrap:break-word;max-width:100%;overflow-x:auto;}
-.fa-ans-math{font-size:1.3rem;line-height:1.9;color:var(--green);font-weight:600;margin-bottom:12px;}
-.fa-q-echo{font-size:.78rem;color:var(--ink3);border-top:1px solid var(--border);padding-top:11px;margin-top:4px;text-align:center;width:100%;}
-.fa-flip-hint{font-size:.7rem;color:var(--ink3);margin-top:14px;font-family:var(--fm);opacity:.65;}
+.fa-ans-math{font-size:1.3rem;line-height:1.9;color:var(--green);font-weight:600;}
 .fa-bmark-row{display:flex;justify-content:center;margin-bottom:6px;}
 .fa-bmark-btn{background:transparent;border:1.5px solid var(--border);border-radius:50%;width:34px;height:34px;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.55;transition:opacity .15s,background .15s;line-height:1;}
 .fa-bmark-btn.saved{opacity:1;background:rgba(184,134,11,.15);border-color:var(--yellow);}
@@ -836,15 +832,11 @@ input{outline:none;font-family:inherit;}
   <div class="fa-topic-badge" id="fa-topic">Algebra</div>
   <div class="fa-card" id="fa-card" onclick="formulaFlip()">
     <div class="fa-side" id="fa-front">
-      <div class="fa-label">Question</div>
       <div class="fa-math" id="fa-q-math"></div>
     </div>
     <div class="fa-side" id="fa-back" style="display:none">
-      <div class="fa-label fa-ans-label">Answer</div>
       <div class="fa-math fa-ans-math" id="fa-a-math"></div>
-      <div class="fa-q-echo" id="fa-q-echo"></div>
     </div>
-    <div class="fa-flip-hint" id="fa-flip-hint">tap card to reveal answer ↓</div>
   </div>
   <div class="fa-bmark-row">
     <button class="fa-bmark-btn" id="fa-bmark" onclick="toggleFBmark()" title="Bookmark">🔖</button>
@@ -1977,7 +1969,6 @@ function fLoadCard(){
   FS.flipped=false;
   document.getElementById('fa-front').style.display='';
   document.getElementById('fa-back').style.display='none';
-  document.getElementById('fa-flip-hint').style.display='';
   document.getElementById('fa-rate').style.display='none';
   document.getElementById('fa-q-math').innerHTML=c.q;
   document.getElementById('fa-topic').textContent=c.tag;
@@ -1998,9 +1989,7 @@ function formulaFlip(){
   FS.flipped=true;
   const c=FS.deck[FS.idx];
   document.getElementById('fa-back').style.display='';
-  document.getElementById('fa-flip-hint').style.display='none';
   document.getElementById('fa-a-math').innerHTML=c.a;
-  document.getElementById('fa-q-echo').innerHTML='<span style="opacity:.55;font-size:.82rem">'+c.q+'</span>';
   document.getElementById('fa-rate').style.display='flex';
   renderKaTeX(document.getElementById('fa-back'));
 }
